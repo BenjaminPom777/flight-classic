@@ -1,0 +1,29 @@
+<html lang="en">
+
+
+<%- include('../partials/head') %>
+
+<body>
+  <%- include('../partials/header') %>
+
+
+<% if(flights.length>0){ %>
+<% for (const flight of flights) { %>
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title"><%= flight.id %></h5>
+    <h6 class="card-subtitle mb-2 text-muted"><%= flight.airline_company?.name %></h6>
+    <p class="card-text"><%= flight.airline_company?.name %></p>
+    <p class="card-text"><%= flight.origin_country?.name %></p>
+    <p class="card-text"><%= flight.destination_country?.name %></p>
+    <p class="card-text"><%= flight.departure_time %></p>
+    <p class="card-text"><%= flight.landing_time %></p>
+    <a href="/flights/<%= flight.id %>" class="card-link">Details</a>
+  </div>
+  <% } %>
+  <% } %>
+
+
+</body>
+
+</html>
