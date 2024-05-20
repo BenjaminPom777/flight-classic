@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const { getAllFlights, createFlight } = require('./db/flights');
+const { getAllFlights, createFlight, getAllFlightsDetails } = require('./db/flights');
 const { getCountryById } = require('./db/countries');
 const { getAirlineCompanyById } = require('./db/airline_companies');
 
@@ -23,16 +23,16 @@ app.post('/register', (req, res) => {
 
 app.get('/', async (req, res) => {
     
-    const flights = await getAllFlights();
-    const flightsDetails = []
-    for (const flight of flights) {
-        flight.origin_country = await getCountryById(flight.origin_country_id);
-        flight.destination_country = await getCountryById(flight.destination_country_id);
-        flight.airline_company = await getAirlineCompanyById(flight.airline_company_id);
-        flightsDetails.push(flight);
-    }
-    console.log(flightsDetails[0])
-    res.render('flights/index', { flights: flightsDetails }); // Serve ejs
+    // const flights = await getAllFlights();
+    // const flightsDetails = []
+    // for (const flight of flights) {
+    //     flight.origin_country = await getCountryById(flight.origin_country_id);
+    //     flight.destination_country = await getCountryById(flight.destination_country_id);
+    //     flight.airline_company = await getAirlineCompanyById(flight.airline_company_id);
+    //     flightsDetails.push(flight);
+    // }
+    const flights = await getAllFlightsDetails();     
+    res.render('flights/index', { flights }); // Serve ejs
 });
 
 

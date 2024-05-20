@@ -55,10 +55,30 @@ async function deleteFlightById(id) {
     }
 }
 
+async function getAllFlightsDetails() {
+    try {
+        const flights = await db('flights')
+            .select(
+                'flights.*',
+                'origin_countries.name as origin_country_name',
+                'destination_countries.name as destination_country_name'
+            )
+            .join('airline_companies', 'flights.airline_company_id', 'airline_companies.id')
+            .join('countries as origin_countries', 'flights.origin_country_id', 'origin_countries.id')
+            .join('countries as destination_countries', 'flights.destination_country_id', 'destination_countries.id');
+        return flights;
+    } catch (error) {
+        console.error('Error getting flights:', error);
+        throw error;
+    }
+}
+
+
 module.exports = {
     createFlight,
     getAllFlights,
     getFlightById,
     updateFlightById,
-    deleteFlightById
+    deleteFlightById,
+    getAllFlightsDetails
 };
