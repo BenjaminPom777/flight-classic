@@ -2,8 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const { getAllFlights, createFlight, getAllFlightsDetails, getFlightById, getAllFlightsDetailsById } = require('./db/flights');
-const { getCountryById } = require('./db/countries');
+const { getCountryById, getAllCountries } = require('./db/countries');
 const { getAirlineCompanyById } = require('./db/airline_companies');
+const { htmlDatetimeLocalToMysqlDatetime, mysqlDatetimeToHtmlDatetimeLocal } = require('./helpers/helpers')
 
 const app = express();
 
@@ -29,11 +30,19 @@ app.get('/', async (req, res) => {
     res.render('index', { flights }); // Serve ejs
 });
 
+
+
+
 app.get('/flights/:id/edit', async (req, res) => {
     const id = req.params.id
     const flight = await getAllFlightsDetailsById(id);
-    console.log(flight)
-    res.render('editFlight', { flight }); // Serve ejs
+
+    flight.departure_time = mysqlDatetimeToHtmlDatetimeLocal(flight.departure_time)
+    flight.landing_time = mysqlDatetimeToHtmlDatetimeLocal(flight.landing_time)
+    
+    const countries = await getAllCountries();
+    console.log(countries)
+    res.render('editFlight', { flight, countries }); // Serve ejs
 });
 
 
