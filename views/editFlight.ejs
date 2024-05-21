@@ -3,7 +3,7 @@
  <p><%= flight.departure_time %></p>
  <div class="container mt-5">
    <h2>Flight Form</h2>
-   <form action="/submit-flight" method="POST">
+   <form action="/flights/<%= flight.id %>/submit" method="POST">
      <div class="form-row">
        <div class="form-group col-md-6">
          <label for="departure_time">Departure Time</label>
@@ -18,7 +18,7 @@
        <div class="form-row">
          <div class="form-group col-md-4">
            <label for="origin_country_name">Origin Country</label>
-           <select class="form-control" id="origin_country_name" name="origin_country_name" required>
+           <select class="form-control" id="origin_country_name" name="origin_country_id" required>
              <option value="">Select a country</option>
              <% if(countries.length > 0){ %>
              <% for (const country of countries) { %>
@@ -31,7 +31,7 @@
        <div class="form-row">
          <div class="form-group col-md-4">
            <label for="destination_country_name">Destination Country</label>
-           <select class="form-control" id="destination_country_name" name="destination_country_name" required>
+           <select class="form-control" id="destination_country_name" name="destination_country_id" required>
              <option value="">Select a country</option>
              <% if(countries.length > 0){ %>
              <% for (const country of countries) { %>

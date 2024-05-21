@@ -1,15 +1,15 @@
-function mysqlDatetimeToHtmlDatetimeLocal(dateTime) {
-    return new Date(dateTime).toISOString().slice(0, 16)
+const moment = require("moment");
+
+function mysqlDatetimeToHtmlDatetimeLocal(dateTime) {    
+    // YYYY - MM - DDThh: mm
+    return moment(dateTime).format('YYYY-MM-DDTHH:mm');
 }
 
 
 function htmlDatetimeLocalToMysqlDatetime(htmlDatetimeLocal) {
     // Assuming htmlDatetimeLocal is a string in 'YYYY-MM-DDTHH:MM' format
-    if (htmlDatetimeLocal) {
-        let [date, time] = htmlDatetimeLocal.split('T');
-        return `${date} ${time}:00`; // Constructs 'YYYY-MM-DD HH:MM:SS'
-    }
-    return null;
+    // YYYY - MM - DD hh: mm: ss
+    return moment(htmlDatetimeLocal).format('YYYY-MM-DD hh:mm:ss');
 }
 
 

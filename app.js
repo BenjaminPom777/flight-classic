@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const { getAllFlights, createFlight, getAllFlightsDetails, getFlightById, getAllFlightsDetailsById } = require('./db/flights');
+const { getAllFlights, createFlight, getAllFlightsDetails, getAllFlightsDetailsById, updateFlightById } = require('./db/flights');
 const { getCountryById, getAllCountries } = require('./db/countries');
 const { getAirlineCompanyById } = require('./db/airline_companies');
 const { htmlDatetimeLocalToMysqlDatetime, mysqlDatetimeToHtmlDatetimeLocal } = require('./helpers/helpers')
@@ -11,6 +11,7 @@ const app = express();
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'))
 
 // app.get('/register', (req, res) => {
@@ -25,12 +26,9 @@ app.use(express.static('public'))
 
 
 app.get('/', async (req, res) => {
-    const flights = await getAllFlightsDetails();
-    console.log(flights[0])
+    const flights = await getAllFlightsDetails();    
     res.render('index', { flights }); // Serve ejs
 });
-
-
 
 
 app.get('/flights/:id/edit', async (req, res) => {
@@ -40,12 +38,23 @@ app.get('/flights/:id/edit', async (req, res) => {
     flight.departure_time = mysqlDatetimeToHtmlDatetimeLocal(flight.departure_time)
     flight.landing_time = mysqlDatetimeToHtmlDatetimeLocal(flight.landing_time)
     
-    const countries = await getAllCountries();
-    console.log(countries)
+    const countries = await getAllCountries();    
     res.render('editFlight', { flight, countries }); // Serve ejs
 });
 
-
+app.post('/flights/:id/submit', async (req, res) => {
+    try {        
+        const flightData = req.body;
+        flightData.departure_time = htmlDatetimeLocalToMysqlDatetime(flightData.departure_time)
+        flightData.landing_time = htmlDatetimeLocalToMysqlDatetime(flightData.landing_time)
+        // VALIDATE FORM DATA    
+        const result = await updateFlightById(req.params.id, flightData)
+        console.log(result)
+        res.redirect('/');
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating flight' });
+    }
+})
 
 
 app.get('/api/flights/details', async (req, res) => {
