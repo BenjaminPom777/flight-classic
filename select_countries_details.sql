@@ -1,4 +1,4 @@
-select flights.*, origin_countries.name as origin_country_name,  destination_countries.name as destination_country_name  from flights
+select flights.*, airline_companies.name, origin_countries.name as origin_country_name,  destination_countries.name as destination_country_name  from flights
 join airline_companies
 on flights.airline_company_id = airline_companies.id
 join countries as origin_countries

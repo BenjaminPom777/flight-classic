@@ -1,25 +1,42 @@
 <html lang="en">
 
 
-<%- include('partials/head') %>
+<head>
+
+  <%- include('partials/head') %>
+  
+</head>
+
 
 <body>
-
   <%- include('partials/header') %>
 
-  <% if(flights.length>0){ %>
-  <% for (const flight of flights) { %>
-  <div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title"><%= flight.id %></h5>
-      <h6 class="card-subtitle mb-2 text-muted"><%= flight.airline %></h6>
-      <p class="card-text"><%= flight.departure %></p>
-      <p class="card-text"><%= flight.arrival %></p>
-      <a href="/flights/<%= flight.id %>" class="card-link">Details</a>
+
+  
+  <% if(flights.length > 0) { %>
+    <div class="row">
+      <% for (const flight of flights) { %>
+        <div class="col-md-4"> <!-- Adjust the column size as needed -->
+          <div class="card mb-4" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title"><%= flight.airline_company_name %></h5>
+              <h6 class="card-subtitle mb-2 text-muted"><%= flight.airline_company_name %></h6>
+              <p class="card-text"><%= flight.airline_company_name %></p>
+              <p class="card-text"><%= flight.origin_country_name %></p>
+              <p class="card-text"><%= flight.destination_country_name %></p>
+              <p class="card-text"><%= flight.departure_time %></p>
+              <p class="card-text"><%= flight.landing_time %></p>
+              <a href="/flights/<%= flight.id %>/edit" class="card-link">Details</a>
+              <!-- <button class="btn btn-primary">edit</button> -->
+            </div>
+          </div>
+        </div>
+      <% } %>
     </div>
   <% } %>
-  <% } %>
+
 
 </body>
+
 
 </html>

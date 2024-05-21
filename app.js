@@ -1,45 +1,43 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const { getAllFlights, createFlight, getAllFlightsDetails } = require('./db/flights');
+const { getAllFlights, createFlight, getAllFlightsDetails, getFlightById, getAllFlightsDetailsById } = require('./db/flights');
 const { getCountryById } = require('./db/countries');
 const { getAirlineCompanyById } = require('./db/airline_companies');
 
 const app = express();
+
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());
+app.use(express.static('public'))
 
-app.get('/register', (req, res) => {
-    res.render('register'); // Serve register form
-});
+// app.get('/register', (req, res) => {
+//     res.render('register'); // Serve register form
+// });
 
-app.post('/register', (req, res) => {
-    // Process registration form data
-    const { username, email, password } = req.body;
-    res.redirect('/');
-});
+// app.post('/register', (req, res) => {
+//     // Process registration form data
+//     const { username, email, password } = req.body;
+//     res.redirect('/');
+// });
 
 
 app.get('/', async (req, res) => {
-    
-    // const flights = await getAllFlights();
-    // const flightsDetails = []
-    // for (const flight of flights) {
-    //     flight.origin_country = await getCountryById(flight.origin_country_id);
-    //     flight.destination_country = await getCountryById(flight.destination_country_id);
-    //     flight.airline_company = await getAirlineCompanyById(flight.airline_company_id);
-    //     flightsDetails.push(flight);
-    // }
-    const flights = await getAllFlightsDetails();     
-    res.render('flights/index', { flights }); // Serve ejs
+    const flights = await getAllFlightsDetails();
+    console.log(flights[0])
+    res.render('index', { flights }); // Serve ejs
+});
+
+app.get('/flights/:id/edit', async (req, res) => {
+    const id = req.params.id
+    const flight = await getAllFlightsDetailsById(id);
+    console.log(flight)
+    res.render('editFlight', { flight }); // Serve ejs
 });
 
 
-app.get('/flights/:id', (req, res) => {
-    console.log(req.params.id);
-    res.send(req.params.id);
-});
+
 
 app.get('/api/flights/details', async (req, res) => {
     try {
@@ -58,8 +56,6 @@ app.get('/api/flights/details', async (req, res) => {
             flight.airline_company = await getAirlineCompanyById(flight.airline_company_id);
             flightsDetails.push(flight);
         }
-
-
         res.status(200).json(flightsDetails);
     } catch (error) {
         res.status(500).json({ error: 'Error getting flights' });

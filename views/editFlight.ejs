@@ -1,0 +1,47 @@
+ <%- include('partials/head.ejs') %>
+ 
+ <div class="container mt-5">
+   <h2>Flight Form</h2>
+   <form action="/submit-flight" method="POST">  
+     <div class="form-row">
+       <div class="form-group col-md-6">
+         <label for="destination_country_id">Destination Country ID</label>
+         <input type="number" class="form-control" id="destination_country_id" name="destination_country_id" required>
+       </div>
+       <div class="form-group col-md-6">
+         <label for="departure_time">Departure Time</label>
+         <input type="datetime-local" class="form-control" id="departure_time" name="departure_time" required>
+       </div>
+     </div>
+     <div class="form-row">
+       <div class="form-group col-md-6">
+         <label for="landing_time">Landing Time</label>
+         <input type="datetime-local" class="form-control" id="landing_time" name="landing_time" required>
+       </div>
+       <div class="form-group col-md-6">
+         <label for="remaining_tickets">Remaining Tickets</label>
+         <input type="number" class="form-control" id="remaining_tickets" name="remaining_tickets" required>
+       </div>
+     </div>
+     <div class="form-row">
+       <div class="form-group col-md-4">
+         <label for="airline_company_name">Airline Company Name</label>
+         <input type="text" class="form-control" id="airline_company_name" name="airline_company_name" required>
+       </div>
+     <div class="form-group col-md-4">
+       <label for="destination_country_name">Destination Country Name</label>
+       <select class="form-control" id="destination_country_name" name="destination_country_name" required>
+         <option value="">Select a country</option>
+         <option value="Country A" <%= flight.destination_country_name === 'Country A' ? 'selected' : '' %>>Country A</option>
+         <option value="Country B" <%= flight.destination_country_name === 'Country B' ? 'selected' : '' %>>Country B</option>
+         <option value="Country C" <%= flight.destination_country_name === 'Country C' ? 'selected' : '' %>>Country C</option>
+       </select>
+     </div>
+       <div class="form-group col-md-4">
+         <label for="destination_country_name">Destination Country Name</label>
+         <input type="text" class="form-control" id="destination_country_name" name="destination_country_name" required>
+       </div>
+     </div>
+     <button type="submit" class="btn btn-primary">Submit</button>
+   </form>
+ </div>

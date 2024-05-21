@@ -60,12 +60,33 @@ async function getAllFlightsDetails() {
         const flights = await db('flights')
             .select(
                 'flights.*',
+                'airline_companies.name as airline_company_name',
                 'origin_countries.name as origin_country_name',
                 'destination_countries.name as destination_country_name'
             )
             .join('airline_companies', 'flights.airline_company_id', 'airline_companies.id')
             .join('countries as origin_countries', 'flights.origin_country_id', 'origin_countries.id')
             .join('countries as destination_countries', 'flights.destination_country_id', 'destination_countries.id');
+        return flights;
+    } catch (error) {
+        console.error('Error getting flights:', error);
+        throw error;
+    }
+}
+
+async function getAllFlightsDetailsById(id) {
+    try {
+        const flights = await db('flights')
+            .select(
+                'flights.*',
+                'airline_companies.name as airline_company_name',
+                'origin_countries.name as origin_country_name',
+                'destination_countries.name as destination_country_name'
+            )
+            .join('airline_companies', 'flights.airline_company_id', 'airline_companies.id')
+            .join('countries as origin_countries', 'flights.origin_country_id', 'origin_countries.id')
+            .join('countries as destination_countries', 'flights.destination_country_id', 'destination_countries.id')
+            .where('flights.id', id).first();
         return flights;
     } catch (error) {
         console.error('Error getting flights:', error);
@@ -80,5 +101,6 @@ module.exports = {
     getFlightById,
     updateFlightById,
     deleteFlightById,
-    getAllFlightsDetails
+    getAllFlightsDetails,
+    getAllFlightsDetailsById
 };
