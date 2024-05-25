@@ -1,10 +1,18 @@
+require('dotenv').config()
 const express = require('express');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+const cookieParser = require('cookie-parser')
+
 
 const { getAllFlights, createFlight, getAllFlightsDetails, getAllFlightsDetailsById, updateFlightById } = require('./db/flights');
 const { getCountryById, getAllCountries } = require('./db/countries');
 const { getAirlineCompanyById } = require('./db/airline_companies');
-const { htmlDatetimeLocalToMysqlDatetime, mysqlDatetimeToHtmlDatetimeLocal } = require('./helpers/helpers')
+const { htmlDatetimeLocalToMysqlDatetime, mysqlDatetimeToHtmlDatetimeLocal } = require('./helpers/helpers');
+const { createCustomer } = require('./db/customers');
+
+const SECRET = process.env.SECRET
 
 const app = express();
 
@@ -12,38 +20,68 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser())
+
 app.use(express.static('public'))
 
-// app.get('/register', (req, res) => {
-//     res.render('register'); // Serve register form
-// });
+const authUser = (req, res, next) => {
+    const jwtToken = req.cookies?.token
+    if (!jwtToken) {
+        return res.redirect('/register')
+    }
+    try {        
+        jwt.verify(jwtToken, SECRET)
+        const decoded = jwt.decode(jwtToken);
+        const user = decoded.user;
+        if (!user) {
+            return res.redirect('/register')
+        }
+        req.userId = user;
+        const token = jwt.sign({ user }, SECRET, { expiresIn: 10 })
+        res.cookie('token', token)
+        return next()
+    } catch (error) {
+        return res.redirect('/register')
+    }
+}
 
-// app.post('/register', (req, res) => {
-//     // Process registration form data
-//     const { username, email, password } = req.body;
-//     res.redirect('/');
-// });
 
-
-app.get('/', async (req, res) => {
-    const flights = await getAllFlightsDetails();    
+app.get('/', authUser, async (req, res) => {
+    const flights = await getAllFlightsDetails();
     res.render('index', { flights }); // Serve ejs
 });
 
+app.get('/register', (req, res) => {
+    res.render('register')
+})
 
-app.get('/flights/:id/edit', async (req, res) => {
+app.post('/register', async (req, res) => {
+    const userData = req.body;
+    if (true) {
+        const hashedPassword = bcrypt.hashSync(userData.password, 10);
+        userData.password = hashedPassword;
+        const userId = await createCustomer(userData)
+        const token = jwt.sign({ user: userId[0] }, SECRET, { expiresIn: '1m' })
+        res.cookie('token', token).redirect('/')
+    } else {
+        res.render('register', { userData })
+    }
+})
+
+
+app.get('/flights/:id/edit', authUser, async (req, res) => {
     const id = req.params.id
     const flight = await getAllFlightsDetailsById(id);
 
     flight.departure_time = mysqlDatetimeToHtmlDatetimeLocal(flight.departure_time)
     flight.landing_time = mysqlDatetimeToHtmlDatetimeLocal(flight.landing_time)
-    
-    const countries = await getAllCountries();    
+
+    const countries = await getAllCountries();
     res.render('editFlight', { flight, countries }); // Serve ejs
 });
 
-app.post('/flights/:id/submit', async (req, res) => {
-    try {        
+app.post('/flights/:id/submit', authUser, async (req, res) => {
+    try {
         const flightData = req.body;
         flightData.departure_time = htmlDatetimeLocalToMysqlDatetime(flightData.departure_time)
         flightData.landing_time = htmlDatetimeLocalToMysqlDatetime(flightData.landing_time)
@@ -60,13 +98,6 @@ app.post('/flights/:id/submit', async (req, res) => {
 app.get('/api/flights/details', async (req, res) => {
     try {
         const flights = await getAllFlights();
-        // const flightsDetails = await Promise.all(flights.map(async flight => {
-        //     flight.origin_country = await getCountryById(flight.origin_country_id);
-        //     flight.destination_country = await getCountryById(flight.destination_country_id);
-        //     flight.airline_company = await getAirlineCompanyById(flight.airline_company_id);
-        //     return flight;
-        // }));
-
         const flightsDetails = []
         for (const flight of flights) {
             flight.origin_country = await getCountryById(flight.origin_country_id);

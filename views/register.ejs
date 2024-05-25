@@ -1,0 +1,37 @@
+    <%- include('partials/head.ejs') %>
+    <%- include('partials/header.ejs') %>
+
+    <div class="container mt-5">
+      <h2>User Registration Form</h2>
+      <form action="/register" method="POST">
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <input type="text" class="form-control" id="first_name" name="first_name" value="<%=locals.userData?.first_name ?? '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <input type="text" class="form-control" id="last_name" name="last_name" value="<%=locals.userData?.last_name ?? '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" class="form-control" id="address" name="address" value="<%=locals.userData?.address ?? '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="phone_no">Phone Number</label>
+          <input type="tel" class="form-control" id="phone_no" name="phone_no" value="<%=locals.userData?.phone_no ?? '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="credit_card_no">Credit Card Number</label>
+          <input type="text" class="form-control" id="credit_card_no" name="credit_card_no" value="<%=locals.userData?.credit_card_no ?? '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="user_name">Username</label>
+          <input type="text" class="form-control" id="user_name" name="user_name" value="<%=locals.userData?.user_name ?? '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
