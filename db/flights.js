@@ -55,9 +55,9 @@ async function deleteFlightById(id) {
     }
 }
 
-async function getAllFlightsDetails() {
+async function getAllFlightsDetails(searchTerm) {
     try {
-        const flights = await db('flights')
+        const query = db('flights')
             .select(
                 'flights.*',
                 'airline_companies.name as airline_company_name',
@@ -67,6 +67,13 @@ async function getAllFlightsDetails() {
             .join('airline_companies', 'flights.airline_company_id', 'airline_companies.id')
             .join('countries as origin_countries', 'flights.origin_country_id', 'origin_countries.id')
             .join('countries as destination_countries', 'flights.destination_country_id', 'destination_countries.id');
+        
+        // Apply the where clause conditionally
+        if (searchTerm) {
+            query.whereRaw('LOWER(airline_companies.name) LIKE ?', [`%${searchTerm.toLowerCase()}%`]);
+        }
+
+        const flights = await query;
         return flights;
     } catch (error) {
         console.error('Error getting flights:', error);

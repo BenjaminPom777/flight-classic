@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const cookieParser = require('cookie-parser')
+const cors = require('cors');
 
 
 const { getAllFlights, createFlight, getAllFlightsDetails, getAllFlightsDetailsById, updateFlightById } = require('./db/flights');
@@ -21,6 +22,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser())
+app.use(cors({ origin: 'http://localhost:5174' , credentials: true}));
 
 app.use(express.static('public'))
 
@@ -69,6 +71,21 @@ app.post('/register', async (req, res) => {
 })
 
 
+app.post('/api/createCustomer', async (req, res) => {
+    const userData = req.body;
+    if (true) {
+        const hashedPassword = bcrypt.hashSync(userData.password, 10);
+        userData.password = hashedPassword;
+        const userId = await createCustomer(userData)
+        const token = jwt.sign({ user: userId[0] }, SECRET, { expiresIn: '1m' })
+        res.cookie('token', token).json({ userId: userId[0] })
+    } else {
+        res.status(400).json({ error: 'Error creating user' })
+    }
+
+})
+
+
 app.get('/flights/:id/edit', authUser, async (req, res) => {
     const id = req.params.id
     const flight = await getAllFlightsDetailsById(id);
@@ -79,6 +96,7 @@ app.get('/flights/:id/edit', authUser, async (req, res) => {
     const countries = await getAllCountries();
     res.render('editFlight', { flight, countries }); // Serve ejs
 });
+
 
 app.post('/flights/:id/submit', authUser, async (req, res) => {
     try {
@@ -96,15 +114,10 @@ app.post('/flights/:id/submit', authUser, async (req, res) => {
 
 
 app.get('/api/flights/details', async (req, res) => {
+    console.log(req.query)
     try {
-        const flights = await getAllFlights();
-        const flightsDetails = []
-        for (const flight of flights) {
-            flight.origin_country = await getCountryById(flight.origin_country_id);
-            flight.destination_country = await getCountryById(flight.destination_country_id);
-            flight.airline_company = await getAirlineCompanyById(flight.airline_company_id);
-            flightsDetails.push(flight);
-        }
+        const flightsDetails = await getAllFlightsDetails(req.query?.search);
+    
         res.status(200).json(flightsDetails);
     } catch (error) {
         res.status(500).json({ error: 'Error getting flights' });
